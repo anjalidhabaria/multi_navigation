@@ -1,0 +1,122 @@
+<launch>
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro'" />
+
+  <!-- Loads robot_description to parameter server from URDF file-->
+<param name="robot_description" command="$(arg urdf_file)" />
+
+  <!-- Map server -->
+  <arg name="map_file" default="$(find simple_navigation_goals)/config/map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+  </node>
+
+
+<group ns="tb3_0">
+
+  <!-- Turtlebot3 -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_0"/>
+  </node>
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <param name="initial_pose_x" value="1"/>
+      <param name="initial_pose_y" value="1"/>
+      <param name="initial_pose_a" value="0"/>
+
+      <param name="odom_frame_id"  value="tb3_0/odom"/>
+      <param name="base_frame_id"  value="tb3_0/base_footprint"/>
+
+      <!-- Use the single map server -->
+    
+    </node>
+
+    <!-- move_base -->
+  <arg name="cmd_vel_topic" default="tb3_0/cmd_vel" />
+  <arg name="odom_topic" default="tb3_0/odom" />
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
+      <param name="global_costmap/scan/sensor_frame" value="tb3_0/base_scan"/>
+      <param name="global_costmap/obstacle_layer/scan/sensor_frame"
+	     value="tb3_0/base_scan"/>
+      <param name="global_costmap/global_frame" value="map"/>
+      <param name="global_costmap/robot_base_frame"
+	     value="tb3_0/base_link"/>
+      <param name="local_costmap/scan/sensor_frame" value="tb3_0/base_scan"/>
+      <param name="local_costmap/obstacle_layer/scan/sensor_frame"
+	     value="tb3_0/base_scan"/>
+      <param name="local_costmap/global_frame" value="tb3_0/odom"/>
+      <param name="local_costmap/robot_base_frame"
+	     value="tb3_0/base_link"/>
+   
+
+    <remap from="cmd_vel" to="tb3_0/$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="tb3_0/$(arg odom_topic)"/>
+  </node>
+  </group>
+
+  <!-- Second Robot -->
+  <group ns="tb3_1">
+
+  <!-- Turtlebot3 -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_1"/>
+  </node>  
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <param name="initial_pose_x" value="-1"/>
+      <param name="initial_pose_y" value="1"/>
+      <param name="initial_pose_a" value="0"/>
+
+      <param name="odom_frame_id"  value="tb3_1/odom"/>
+      <param name="base_frame_id"  value="tb3_1/base_footprint"/>
+
+      <!-- Use the single map server -->
+     
+    </node>
+
+  <!-- move_base -->
+  <arg name="cmd_vel_topic" default="tb3_1//cmd_vel" />
+  <arg name="odom_topic" default="tb3_1/odom" />
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
+      <param name="global_costmap/scan/sensor_frame" value="tb3_1/base_scan"/>
+      <param name="global_costmap/obstacle_layer/scan/sensor_frame"
+	     value="tb3_1/base_scan"/>
+      <param name="global_costmap/global_frame" value="map"/>
+      <param name="global_costmap/robot_base_frame"
+	     value="tb3_1/base_link"/>
+      <param name="local_costmap/scan/sensor_frame" value="tb3_1/base_scan"/>
+      <param name="local_costmap/obstacle_layer/scan/sensor_frame"
+	     value="tb3_1/base_scan"/>
+      <param name="local_costmap/global_frame" value="tb3_1/odom"/>
+      <param name="local_costmap/robot_base_frame"
+	     value="tb3_1/base_link"/>
+
+    <remap from="cmd_vel" to="tb3_1/$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="tb3_1/$(arg odom_topic)"/>
+  </node>
+  </group>
+
+
+  <node pkg="rviz" type="rviz" name="rviz" required="true"
+args="-d $(find simple_navigation_goals)/rviz/two_tb3_one_map_twogoals.rviz"/>
+
+</launch>

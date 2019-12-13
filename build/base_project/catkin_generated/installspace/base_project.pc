@@ -1,0 +1,8 @@
+prefix=/home/anjali/multi_navigation/install
+
+Name: base_project
+Description: Description of base_project
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/anjali/multi_navigation/install/lib 
+Requires: 

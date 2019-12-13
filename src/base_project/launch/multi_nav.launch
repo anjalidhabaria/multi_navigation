@@ -1,0 +1,48 @@
+<launch>
+  <param name="/use_sim_time" value="true"/>
+
+  <!-- Run the map server, change the map-package name here -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find base_project)/maps/map.yaml" >
+    <param name="frame_id" value="/map" />
+  </node>
+
+  <group ns="first_tb3">
+    <param name="tf_prefix" value="robot0_tf" />
+    <param name="amcl/initial_pose_x" value="1" />
+    <param name="amcl/initial_pose_y" value="1" />
+    <include file="$(find base_project)/launch/move_base.launch" />
+  </group>
+
+  <group ns="second_tb3">
+    <param name="tf_prefix" value="robot1_tf" />
+    <param name="amcl/initial_pose_x" value="-1" />
+    <param name="amcl/initial_pose_y" value="1" />
+    <include file="$(find base_project)/launch/move_base.launch" />
+  </group>
+
+  <group ns="third_tb3">
+    <param name="tf_prefix" value="robot2_tf" />
+    <param name="amcl/initial_pose_x" value="4" />
+    <param name="amcl/initial_pose_y" value="-1" />
+    <include file="$(find base_project)/launch/move_base.launch" />
+  </group>
+
+  <group ns="fourth_tb3">
+    <param name="tf_prefix" value="robot3_tf" />
+    <param name="amcl/initial_pose_x" value="3" />
+    <param name="amcl/initial_pose_y" value="-2" />
+    <include file="$(find base_project)/launch/move_base.launch" />
+  </group>
+
+  <group ns="fifth_tb3">
+    <param name="tf_prefix" value="robot4_tf" />
+    <param name="amcl/initial_pose_x" value="-4" />
+    <param name="amcl/initial_pose_y" value="-3" />
+    <include file="$(find base_project)/launch/move_base.launch" />
+  </group>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find base_project)/rviz/multi_nav_rviz.rviz"
+   output="screen" />
+
+</launch>
+
